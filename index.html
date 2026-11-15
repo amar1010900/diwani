@@ -5,29 +5,36 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>ديواني</title>
 <meta name="description" content="ديوان شعر">
+<meta name="theme-color" content="#2a1a12">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%232a1a12'/%3E%3Ctext x='32' y='46' font-size='40' text-anchor='middle' fill='%23d4a94e' font-family='serif'%3E%DB%9E%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Aref+Ruqaa:wght@400;700&family=Reem+Kufi:wght@500;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap">
 <style>
-/* Layout: a single centered reading column, like pages of a bound diwan; poems sit on leather-toned sheets framed by a thin gold rule. */
+/* Layout: a bound diwan. The home page is its table of contents (cards); each poem opens on its own leather sheet framed by a thin gold rule. */
 :root{
-  --bg:#2a1a12; --bg-2:#3a2519; --sheet:#4a3022; --sheet-edge:#5e3e2c;
+  --bg:#2a1a12; --bg-2:#3a2519; --sheet:#4a3022; --sheet-edge:#5e3e2c; --sheet-hi:#56382a;
   --ink:#f1e4d2; --ink-soft:#c9b29a; --ink-faint:#9a8069;
-  --gold:#d4a94e; --gold-soft:#a9843a; --danger:#e08a6e;
+  --gold:#d4a94e; --gold-soft:#a9843a; --gold-hi:#e9c977; --danger:#e08a6e; --ok:#9fbf7a;
   --f-poem:"Amiri","Noto Naskh Arabic","Times New Roman",serif;
   --f-name:"Aref Ruqaa","Amiri",serif;
   --f-head:"Reem Kufi","Amiri",serif;
   --f-ui:"IBM Plex Sans Arabic","Segoe UI",Tahoma,sans-serif;
+  --scale:1;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
 html,body{margin:0}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-ui);font-size:16px;line-height:1.6;
-  background-image:radial-gradient(ellipse at top,var(--bg-2),var(--bg) 70%);min-height:100vh}
-#root{max-width:760px;margin:0 auto;padding-block:48px 80px;
+  background-image:radial-gradient(ellipse at top,var(--bg-2),var(--bg) 70%);background-attachment:fixed;min-height:100vh}
+a{color:inherit}
+#root{max-width:780px;margin:0 auto;padding-block:40px 96px;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
-  display:flex;flex-direction:column;gap:40px}
-header.mast{text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px}
+  display:flex;flex-direction:column;gap:32px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* masthead */
+header.mast{text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;padding-top:8px}
 .orn{color:var(--gold);font-family:var(--f-poem);font-size:30px;line-height:1;opacity:.9;text-shadow:0 0 18px rgba(212,169,78,.35)}
 .name-wrap{display:flex;align-items:center;justify-content:center;gap:clamp(12px,3vw,24px);width:100%}
 .rule{flex:1;max-width:160px;height:1px;position:relative;background:linear-gradient(to left,transparent,var(--gold-soft) 40%,var(--gold))}
@@ -35,80 +42,144 @@ header.mast{text-align:center;display:flex;flex-direction:column;align-items:cen
 .rule::after{content:"";position:absolute;top:50%;width:7px;height:7px;background:var(--gold);transform:translateY(-50%) rotate(45deg)}
 .rule.l::after{left:-3px}.rule.r::after{right:-3px}
 h1{font-family:var(--f-name);font-weight:700;font-size:clamp(64px,16vw,112px);line-height:1.35;margin:0;padding-inline:.08em;text-wrap:balance;
-  color:var(--gold);background:linear-gradient(100deg,#9c7330 0%,#e9c977 28%,#fff1c4 45%,#d4a94e 60%,#8f6828 100%);background-size:220% 100%;background-position:100% 0;
+  color:var(--gold);background:linear-gradient(100deg,#9c7330 0%,var(--gold-hi) 28%,#fff1c4 45%,var(--gold) 60%,#8f6828 100%);background-size:220% 100%;background-position:100% 0;
   -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
   filter:drop-shadow(0 2px 0 rgba(0,0,0,.45)) drop-shadow(0 0 22px rgba(212,169,78,.25))}
 @media (prefers-reduced-motion:no-preference){h1{animation:gild 2.8s ease-out .2s both}@keyframes gild{from{background-position:0 0}to{background-position:100% 0}}}
-.tag{font-family:var(--f-poem);font-size:20px;color:var(--ink-soft);margin:0;text-wrap:balance}
-.count{font-size:13px;color:var(--ink-faint);letter-spacing:.02em}
-nav.toc{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 18px;font-family:var(--f-poem);font-size:18px}
-nav.toc a{color:var(--ink-soft);text-decoration:none;border-bottom:1px solid transparent}
-nav.toc a:hover,nav.toc a:focus-visible{color:var(--gold);border-color:var(--gold-soft);outline:none}
-.poems{display:flex;flex-direction:column;gap:36px}
-article.poem{background:var(--sheet);border:1px solid var(--sheet-edge);border-radius:4px;padding:40px clamp(18px,5vw,48px) 32px;position:relative;
-  box-shadow:0 18px 40px -20px rgba(0,0,0,.6)}
-article.poem::before{content:"";position:absolute;inset:8px;border:1px solid var(--gold-soft);border-radius:2px;opacity:.45;pointer-events:none}
-article.poem h2{font-family:var(--f-head);font-weight:500;font-size:28px;color:var(--gold);text-align:center;margin:0 0 6px;text-wrap:balance}
-.meta{text-align:center;font-size:13px;color:var(--ink-faint);margin-bottom:26px}
-.verses{font-family:var(--f-poem);font-size:clamp(19px,4.4vw,23px);line-height:2.1;color:var(--ink);display:flex;flex-direction:column}
-.bayt{display:grid;grid-template-columns:1fr auto 1fr;gap:0 18px;align-items:baseline}
-.bayt .sadr{text-align:left}.bayt .ajz{text-align:right}
-.bayt .sep{color:var(--gold-soft);font-size:.7em}
-.free{text-align:center}
-.gap{height:.9em}
-@media (max-width:520px){.bayt{grid-template-columns:1fr;text-align:center}.bayt .sadr,.bayt .ajz{text-align:center}.bayt .sep{display:none}.bayt .ajz{margin-bottom:.4em}}
-.end{text-align:center;color:var(--gold);margin-top:22px;font-size:18px;opacity:.8}
-.empty{text-align:center;padding:48px 20px;border:1px dashed var(--sheet-edge);border-radius:4px;color:var(--ink-soft);font-family:var(--f-poem);font-size:20px}
-.empty small{display:block;font-family:var(--f-ui);font-size:14px;color:var(--ink-faint);margin-top:8px}
-.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;background:var(--bg-2);border:1px solid var(--sheet-edge);border-radius:4px;padding:12px 16px}
-.bar .who{font-size:14px;color:var(--ink-soft)}
-.bar .who b{color:var(--gold);font-weight:600}
+.tag{font-family:var(--f-poem);font-size:21px;color:var(--ink-soft);margin:0;text-wrap:balance}
+.count{font-size:13px;color:var(--ink-faint)}
+
+/* small header on a poem page */
+.topnav{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.mini-name{font-family:var(--f-name);font-weight:700;font-size:34px;line-height:1.2;color:var(--gold);text-decoration:none}
+.back{display:inline-flex;align-items:center;gap:8px;color:var(--ink-soft);text-decoration:none;font-size:15px;padding:6px 2px;border-bottom:1px solid transparent}
+.back:hover{color:var(--gold);border-color:var(--gold-soft)}
+
+/* owner bar */
+.bar{position:sticky;top:max(8px,env(safe-area-inset-top,0px));z-index:5;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;
+  background:rgba(58,37,25,.92);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border:1px solid var(--sheet-edge);border-radius:6px;padding:10px 14px;box-shadow:0 10px 30px -18px #000}
+.bar .who{font-size:14px;color:var(--ink-soft);display:flex;align-items:center;gap:8px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px rgba(159,191,122,.18)}
 .btns{display:flex;flex-wrap:wrap;gap:8px}
-button{font-family:var(--f-ui);font-size:14px;font-weight:500;cursor:pointer;border-radius:3px;padding:8px 14px;border:1px solid var(--gold-soft);background:transparent;color:var(--gold)}
-button:hover{background:rgba(212,169,78,.1)}
-button.primary{background:var(--gold);color:var(--bg);border-color:var(--gold)}
-button.primary:hover{background:#e2ba62}
+
+/* buttons */
+button,.btn{font-family:var(--f-ui);font-size:14px;font-weight:500;cursor:pointer;border-radius:4px;padding:9px 16px;min-height:40px;border:1px solid var(--gold-soft);background:transparent;color:var(--gold);
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;transition:background .15s,border-color .15s,color .15s}
+button:hover,.btn:hover{background:rgba(212,169,78,.1)}
+button.primary{background:var(--gold);color:var(--bg);border-color:var(--gold);font-weight:600}
+button.primary:hover{background:var(--gold-hi)}
+button.ghost{border-color:transparent;color:var(--ink-soft)}
+button.ghost:hover{color:var(--gold);background:rgba(212,169,78,.08)}
 button.danger{border-color:var(--danger);color:var(--danger)}
+button.danger:hover{background:rgba(224,138,110,.1)}
 button:disabled{opacity:.5;cursor:default}
 button:focus-visible,input:focus-visible,textarea:focus-visible,a:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
-.tools{display:flex;justify-content:center;gap:8px;margin-top:22px;flex-wrap:wrap;position:relative}
-form.editor{background:var(--bg-2);border:1px solid var(--gold-soft);border-radius:4px;padding:22px;display:flex;flex-direction:column;gap:14px}
-form.editor h3{margin:0;font-family:var(--f-head);font-weight:500;color:var(--gold);font-size:22px}
+
+/* index */
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.search{flex:1;min-width:200px;position:relative}
+.search input{padding-inline-start:38px}
+.search svg{position:absolute;inset-inline-start:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;stroke:var(--ink-faint);fill:none;stroke-width:2}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{min-height:34px;padding:5px 14px;border-radius:999px;border-color:var(--sheet-edge);color:var(--ink-soft);font-size:13px}
+.chip[aria-pressed="true"]{background:var(--gold);border-color:var(--gold);color:var(--bg)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:16px}
+a.card{display:flex;flex-direction:column;gap:10px;min-width:0;text-decoration:none;background:var(--sheet);border:1px solid var(--sheet-edge);border-radius:6px;padding:22px 22px 18px;position:relative;
+  transition:transform .2s ease,border-color .2s ease,background .2s ease;box-shadow:0 14px 30px -22px #000}
+a.card:hover{border-color:var(--gold-soft);background:var(--sheet-hi);transform:translateY(-2px)}
+a.card.is-priv{background:var(--bg-2);border-style:dashed;border-color:var(--gold-soft)}
+.card h3{margin:0;font-family:var(--f-head);font-weight:500;font-size:22px;line-height:1.4;color:var(--gold);text-wrap:balance}
+.excerpt{margin:0;font-family:var(--f-poem);font-size:18px;line-height:1.9;color:var(--ink-soft);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px;color:var(--ink-faint);margin-top:auto;padding-top:4px}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;border-radius:999px;padding:2px 10px;background:var(--gold-soft);color:var(--bg)}
+.skel{height:150px;border-radius:6px;background:linear-gradient(90deg,var(--sheet) 0%,var(--sheet-hi) 50%,var(--sheet) 100%);background-size:200% 100%;opacity:.6}
+@media (prefers-reduced-motion:no-preference){.skel{animation:sh 1.4s linear infinite}@keyframes sh{from{background-position:200% 0}to{background-position:0 0}}}
+.empty{text-align:center;padding:56px 20px;border:1px dashed var(--sheet-edge);border-radius:6px;color:var(--ink-soft);font-family:var(--f-poem);font-size:21px;display:flex;flex-direction:column;align-items:center;gap:10px}
+.empty small{font-family:var(--f-ui);font-size:14px;color:var(--ink-faint)}
+
+/* poem page */
+article.poem{background:var(--sheet);border:1px solid var(--sheet-edge);border-radius:6px;padding:48px clamp(18px,5vw,52px) 36px;position:relative;box-shadow:0 22px 44px -24px #000}
+article.poem::before{content:"";position:absolute;inset:8px;border:1px solid var(--gold-soft);border-radius:3px;opacity:.45;pointer-events:none}
+article.poem.is-priv{background:var(--bg-2);border-style:dashed;border-color:var(--gold-soft)}
+article.poem.is-priv::before{opacity:.2}
+.pill-row{display:flex;justify-content:center;margin-bottom:12px}
+article.poem h2{font-family:var(--f-head);font-weight:500;font-size:clamp(26px,5vw,32px);color:var(--gold);text-align:center;margin:0 0 6px;text-wrap:balance}
+.meta{text-align:center;font-size:13px;color:var(--ink-faint);margin-bottom:30px}
+.verses{font-family:var(--f-poem);font-size:calc(clamp(19px,4.4vw,23px) * var(--scale));line-height:2.15;color:var(--ink);display:flex;flex-direction:column}
+.bayt{display:grid;grid-template-columns:1fr auto 1fr;gap:0 18px;align-items:baseline}
+.bayt .sadr{text-align:left}.bayt .ajz{text-align:right}
+.bayt .sep{color:var(--gold-soft);font-size:.6em}
+.free{text-align:center}
+.gap{height:.9em}
+@media (max-width:560px){.bayt{grid-template-columns:1fr;text-align:center}.bayt .sadr,.bayt .ajz{text-align:center}.bayt .sep{display:none}.bayt .ajz{margin-bottom:.45em}}
+.end{text-align:center;color:var(--gold);margin-top:26px;font-size:18px;opacity:.8}
+.reader-tools{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center}
+.sizer{display:inline-flex;border:1px solid var(--sheet-edge);border-radius:4px;overflow:hidden}
+.sizer button{border:0;border-radius:0;min-height:36px;padding:4px 14px;color:var(--ink-soft)}
+.sizer button+button{border-inline-start:1px solid var(--sheet-edge)}
+.owner-tools{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding-top:22px;margin-top:26px;border-top:1px solid var(--sheet-edge);position:relative}
+.confirm{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;color:var(--ink-soft);font-size:14px}
+.pager{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pager a{display:flex;flex-direction:column;gap:2px;text-decoration:none;padding:14px 16px;border:1px solid var(--sheet-edge);border-radius:6px;min-width:0;transition:border-color .15s,background .15s}
+.pager a:hover{border-color:var(--gold-soft);background:rgba(212,169,78,.06)}
+.pager .lbl{font-size:12px;color:var(--ink-faint)}
+.pager .ttl{font-family:var(--f-head);color:var(--gold);font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pager .next{text-align:left;grid-column:2}
+
+/* forms */
+form.editor{background:var(--bg-2);border:1px solid var(--gold-soft);border-radius:6px;padding:clamp(18px,4vw,28px);display:flex;flex-direction:column;gap:16px}
+form.editor h2{margin:0;font-family:var(--f-head);font-weight:500;color:var(--gold);font-size:24px}
 label{display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--ink-soft)}
-input,textarea{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--sheet-edge);border-radius:3px;padding:10px 12px;width:100%}
+input,textarea{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--sheet-edge);border-radius:4px;padding:11px 12px;width:100%;transition:border-color .15s}
+input:focus,textarea:focus{border-color:var(--gold-soft)}
 input.ltr{direction:ltr;text-align:left}
-textarea{font-family:var(--f-poem);font-size:20px;line-height:1.9;min-height:260px;resize:vertical}
+#ed-title{font-family:var(--f-head);font-size:20px;color:var(--gold)}
+textarea{font-family:var(--f-poem);font-size:21px;line-height:2;min-height:320px;resize:vertical}
+.seg{display:inline-flex;border:1px solid var(--sheet-edge);border-radius:6px;padding:3px;gap:3px;background:var(--bg)}
+.seg button{border:0;min-height:36px;padding:6px 14px;color:var(--ink-soft)}
+.seg button[aria-pressed="true"]{background:var(--sheet-hi);color:var(--gold)}
+.field-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}
+.tabs{display:inline-flex;gap:4px}
+.tabs button{min-height:34px;padding:4px 14px;border-color:transparent;color:var(--ink-faint)}
+.tabs button[aria-selected="true"]{color:var(--gold);border-color:var(--gold-soft)}
+.preview{background:var(--sheet);border:1px solid var(--sheet-edge);border-radius:4px;padding:24px clamp(12px,4vw,32px);min-height:320px}
 .hint{font-size:13px;color:var(--ink-faint);margin:0}
 .hint code{color:var(--gold);font-family:inherit}
 .hint a{color:var(--gold)}
-.row{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-start}
-.status{font-size:14px;color:var(--ink-soft);min-height:1.4em}
-.status.err{color:var(--danger)}
-footer{text-align:center;font-size:13px;color:var(--ink-faint)}
-@media (prefers-reduced-motion:no-preference){article.poem{animation:rise .5s ease both}@keyframes rise{from{transform:translateY(8px)}to{transform:none}}}
-article.poem.is-priv{background:var(--bg-2);border-style:dashed;border-color:var(--gold-soft)}
-article.poem.is-priv::before{opacity:.2}
-.badge{display:inline-flex;align-items:center;gap:6px;font-family:var(--f-ui);font-size:12px;font-weight:500;color:var(--bg);background:var(--gold-soft);border-radius:999px;padding:2px 10px;margin:0 auto 10px}
-.badge-row{display:flex;justify-content:center}
-.check{flex-direction:row;align-items:center;gap:10px;color:var(--ink);font-size:15px;cursor:pointer}
-.check input{width:18px;height:18px;margin:0;accent-color:var(--gold)}
 .warn{font-size:13px;color:var(--danger);margin:0}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.row .kbd{font-size:12px;color:var(--ink-faint);margin-inline-start:auto}
+.err-text{color:var(--danger);font-size:14px;margin:0}
+
+/* toast */
+#toast{position:fixed;left:50%;bottom:max(20px,calc(env(safe-area-inset-bottom,0px) + 12px));transform:translate(-50%,20px);opacity:0;pointer-events:none;z-index:20;
+  max-width:min(92vw,520px);background:var(--sheet-hi);color:var(--ink);border:1px solid var(--gold-soft);border-radius:6px;padding:12px 18px;font-size:15px;box-shadow:0 18px 40px -16px #000;transition:opacity .2s,transform .2s}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+#toast.err{border-color:var(--danger)}
+
+footer{text-align:center;font-size:13px;color:var(--ink-faint)}
+@media (prefers-reduced-motion:no-preference){article.poem,.grid{animation:rise .45s ease both}@keyframes rise{from{transform:translateY(8px)}to{transform:none}}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
 <div id="root"><header class="mast"><div class="orn" aria-hidden="true">۞</div><div class="name-wrap"><span class="rule l" aria-hidden="true"></span><h1>ديواني</h1><span class="rule r" aria-hidden="true"></span></div></header></div>
+<div id="toast" role="status" aria-live="polite"></div>
 <script>
 (function(){
   // Public poems live in this site's repository (anyone can read them).
   // Private poems live in a separate PRIVATE repository that only the owner's key can open.
   var OWNER='amar1010900', REPO='diwani', FILE='poems.json', PRIV_REPO='diwani-private', PRIV_FILE='private.json';
-  var TOKEN_KEY='diwani-token', DRAFT='diwani-draft';
+  var TOKEN_KEY='diwani-token', DRAFT='diwani-draft', SCALE_KEY='diwani-scale';
   function api(repo){return 'https://api.github.com/repos/'+OWNER+'/'+repo}
 
-  var root=document.getElementById('root');
+  var root=document.getElementById('root'), toastEl=document.getElementById('toast');
   var meta={name:'ديواني',tagline:''}, pub=[], priv=[], shaPub=null, shaPriv=null, privOk=false, loaded=false, loadErr=false;
-  var token=null, isOwner=false, editing=null, confirmDel=null, editingHead=false, busy=false, msg='', msgErr=false;
+  var token=null, isOwner=false, busy=false;
+  var mode=null, editId=null, draft=null, dirty=false, edTab='write', loginErr='';
+  var confirmDel=false, query='', filter='all', scale=1;
   try{token=localStorage.getItem(TOKEN_KEY)}catch(e){}
+  try{scale=parseFloat(localStorage.getItem(SCALE_KEY))||1}catch(e){}
 
   function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
   function fmtDate(iso){try{return new Date(iso).toLocaleDateString('ar-SA-u-ca-gregory',{year:'numeric',month:'long',day:'numeric'})}catch(e){return ''}}
@@ -120,8 +191,15 @@ article.poem.is-priv::before{opacity:.2}
     return fetch(url,opts);
   }
   function clone(a){return JSON.parse(JSON.stringify(a))}
+  function plural(n){return n===1?'قصيدة واحدة':n===2?'قصيدتان':n<=10?n+' قصائد':n+' قصيدة'}
 
-  // Every poem on screen, newest first. Visitors only ever have the public list.
+  var toastTimer;
+  function toast(text,isErr){
+    toastEl.textContent=text;toastEl.className='show'+(isErr?' err':'');
+    clearTimeout(toastTimer);toastTimer=setTimeout(function(){toastEl.className=isErr?'err':''},isErr?6000:3200);
+  }
+
+  // ---------- data ----------
   function shown(){
     var a=pub.map(function(p){return {p:p,priv:false}});
     if(isOwner)a=a.concat(priv.map(function(p){return {p:p,priv:true}}));
@@ -129,101 +207,11 @@ article.poem.is-priv::before{opacity:.2}
   }
   function findPoem(id){
     for(var i=0;i<pub.length;i++)if(pub[i].id===id)return {p:pub[i],priv:false};
-    for(var j=0;j<priv.length;j++)if(priv[j].id===id)return {p:priv[j],priv:true};
+    if(isOwner)for(var j=0;j<priv.length;j++)if(priv[j].id===id)return {p:priv[j],priv:true};
     return null;
   }
-
-  function verses(text){
-    var out='';
-    String(text).replace(/\r/g,'').split('\n').forEach(function(l){
-      var t=l.trim();
-      if(!t){out+='<div class="gap"></div>';return}
-      var i=t.indexOf('*');
-      if(i>-1){out+='<div class="bayt"><span class="sadr">'+esc(t.slice(0,i).trim())+'</span><span class="sep">✦</span><span class="ajz">'+esc(t.slice(i+1).trim())+'</span></div>'}
-      else out+='<div class="free">'+esc(t)+'</div>';
-    });
-    return out;
-  }
-
-  function editorForm(item){
-    var d=item?{title:item.p.title,text:item.p.text,priv:item.priv}:{title:'',text:'',priv:false};
-    try{var dr=JSON.parse(sessionStorage.getItem(DRAFT)||'null');if(dr&&dr.id===(item?item.p.id:'new')){d=dr}}catch(e){}
-    return '<form class="editor" id="ed"><h3>'+(item?'تعديل القصيدة':'قصيدة جديدة')+'</h3>'+
-      '<label for="ed-title">العنوان<input id="ed-title" required maxlength="120" value="'+esc(d.title)+'"></label>'+
-      '<label for="ed-text">الأبيات<textarea id="ed-text" required>'+esc(d.text)+'</textarea></label>'+
-      '<p class="hint">للبيت العمودي افصل الصدر عن العجز بعلامة <code>*</code> ، وسطر فارغ يفصل بين المقاطع.</p>'+
-      '<label class="check" for="ed-priv"><input type="checkbox" id="ed-priv"'+(d.priv?' checked':'')+(privOk?'':' disabled')+'>خاصة: لا يراها أحد غيرك</label>'+
-      (privOk?'':'<p class="warn">مفتاحك لا يملك صلاحية على المستودع '+PRIV_REPO+'، لذلك القصائد الخاصة غير متاحة الآن.</p>')+
-      '<div class="row"><button type="submit" class="primary"'+(busy?' disabled':'')+'>نشر</button><button type="button" data-act="cancel">إلغاء</button></div></form>';
-  }
-
-  function loginForm(){
-    return '<form class="editor" id="login"><h3>دخول صاحب الديوان</h3>'+
-      '<label for="tok">مفتاح GitHub<input id="tok" class="ltr" type="password" autocomplete="off" spellcheck="false" required></label>'+
-      '<p class="hint">المفتاح يُحفظ في هذا المتصفح فقط. أنشئه من <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">إعدادات GitHub</a>: اختر المستودعين <code>'+REPO+'</code> و<code>'+PRIV_REPO+'</code>، وصلاحية Contents: Read and write.</p>'+
-      '<div class="row"><button type="submit" class="primary"'+(busy?' disabled':'')+'>دخول</button></div>'+
-      '<div class="status'+(msgErr?' err':'')+'" role="status">'+esc(msg)+'</div></form>';
-  }
-
-  function countText(){
-    var n=pub.length, s=n?n+' '+(n===1?'قصيدة':n===2?'قصيدتان':n<=10?'قصائد':'قصيدة'):'';
-    if(isOwner&&priv.length)s+=(s?' · ':'')+priv.length+' خاصة';
-    return s;
-  }
-
-  function render(){
-    var list=shown();
-    var h='<header class="mast"><div class="orn" aria-hidden="true">۞</div><div class="name-wrap"><span class="rule l" aria-hidden="true"></span><h1>'+esc(meta.name)+'</h1><span class="rule r" aria-hidden="true"></span></div>'+
-      (meta.tagline?'<p class="tag">'+esc(meta.tagline)+'</p>':'')+
-      '<div class="count">'+esc(countText())+'</div></header>';
-    if(isOwner){
-      h+='<div class="bar"><span class="who">أنت <b>صاحب الديوان</b>. الزوار يرون القصائد العامة فقط.</span><div class="btns">'+
-        '<button class="primary" data-act="new"'+(editing||busy?' disabled':'')+'>قصيدة جديدة</button>'+
-        '<button data-act="head"'+(busy?' disabled':'')+'>تعديل العنوان</button>'+
-        '<button data-act="logout">خروج</button></div></div>';
-      if(editingHead){
-        h+='<form class="editor" id="hd"><h3>عنوان الديوان</h3><label for="hd-name">الاسم<input id="hd-name" required maxlength="60" value="'+esc(meta.name)+'"></label>'+
-          '<label for="hd-tag">سطر التعريف<input id="hd-tag" maxlength="140" value="'+esc(meta.tagline)+'"></label>'+
-          '<div class="row"><button type="submit" class="primary"'+(busy?' disabled':'')+'>حفظ</button><button type="button" data-act="cancel">إلغاء</button></div></form>';
-      }
-      if(editing==='new')h+=editorForm(null);
-      h+='<div class="status'+(msgErr?' err':'')+'" role="status">'+esc(msg)+'</div>';
-    }else if(location.hash==='#write'){
-      h+=loginForm();
-    }
-    if(list.length>2){
-      h+='<nav class="toc" aria-label="فهرس القصائد">'+list.map(function(it){return '<a href="#p-'+esc(it.p.id)+'">'+esc(it.p.title)+'</a>'}).join('')+'</nav>';
-    }
-    if(!loaded){
-      h+='<div class="empty">'+(loadErr?'تعذّر تحميل القصائد<small>حدّث الصفحة بعد قليل.</small>':'جارٍ تحميل القصائد…')+'</div>';
-    }else if(!list.length){
-      h+='<div class="empty">لم تُنشر قصائد بعد'+(isOwner?'<small>اضغط «قصيدة جديدة» لكتابة أول قصيدة.</small>':'<small>عُد قريبًا.</small>')+'</div>';
-    }else{
-      h+='<div class="poems">'+list.map(function(it){
-        var p=it.p;
-        if(isOwner&&editing===p.id)return editorForm(it);
-        var tools='';
-        if(isOwner){
-          tools=confirmDel===p.id
-            ?'<div class="tools"><span class="hint">حذف هذه القصيدة نهائيًا؟</span><button class="danger" data-act="del-yes" data-id="'+esc(p.id)+'">نعم، احذف</button><button data-act="del-no">تراجع</button></div>'
-            :'<div class="tools"><button data-act="edit" data-id="'+esc(p.id)+'"'+(editing||busy?' disabled':'')+'>تعديل</button>'+
-              '<button data-act="flip" data-id="'+esc(p.id)+'"'+(busy||!privOk?' disabled':'')+'>'+(it.priv?'اجعلها عامة':'اجعلها خاصة')+'</button>'+
-              '<button class="danger" data-act="del" data-id="'+esc(p.id)+'"'+(busy?' disabled':'')+'>حذف</button></div>';
-        }
-        return '<article class="poem'+(it.priv?' is-priv':'')+'" id="p-'+esc(p.id)+'">'+
-          (it.priv?'<div class="badge-row"><span class="badge">خاصة · لا يراها غيرك</span></div>':'')+
-          '<h2>'+esc(p.title)+'</h2><div class="meta">'+esc(fmtDate(p.date))+'</div>'+
-          '<div class="verses">'+verses(p.text)+'</div><div class="end" aria-hidden="true">۞</div>'+tools+'</article>';
-      }).join('')+'</div>';
-    }
-    h+='<footer>جميع القصائد محفوظة لكاتبها</footer>';
-    root.innerHTML=h;
-    document.title=meta.name||'ديواني';
-  }
-
   function setPublic(d){meta={name:d.name||'ديواني',tagline:d.tagline||''};pub=Array.isArray(d.poems)?d.poems:[];loaded=true;loadErr=false}
 
-  // Visitors read the published file only; the private file is never requested for them.
   function loadPublic(){
     return fetch(FILE+'?v='+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json()})
       .then(setPublic,function(){loaded=false;loadErr=true});
@@ -248,7 +236,6 @@ article.poem.is-priv::before{opacity:.2}
     return gh(api(REPO)).then(function(r){if(!r.ok)throw r.status;return r.json()})
       .then(function(repo){if(!repo.permissions||!repo.permissions.push)throw 403;isOwner=true;return loadOwner()});
   }
-
   function putFile(repo,file,obj,sha){
     var body={message:'تحديث الديوان',content:toB64(JSON.stringify(obj,null,2)+'\n')};
     if(sha)body.sha=sha;
@@ -262,31 +249,26 @@ article.poem.is-priv::before{opacity:.2}
 
   // change: {meta?, pub?, priv?}. When a poem moves between lists, the list it joins is written
   // first, so a failure halfway leaves it in both lists rather than in neither.
-  function save(change,done){
-    busy=true;msg='جارٍ النشر…';msgErr=false;render();
-    var steps=[];
-    function pubStep(){return putFile(REPO,FILE,{name:(change.meta||meta).name,tagline:(change.meta||meta).tagline,poems:change.pub||pub},shaPub)
+  function save(change,okText,after){
+    busy=true;render();
+    function pubStep(){var m=change.meta||meta;return putFile(REPO,FILE,{name:m.name,tagline:m.tagline,poems:change.pub||pub},shaPub)
       .then(function(s){shaPub=s;if(change.meta)meta=change.meta;if(change.pub)pub=change.pub})}
     function privStep(){return putFile(PRIV_REPO,PRIV_FILE,{poems:change.priv},shaPriv).then(function(s){shaPriv=s;priv=change.priv})}
-    var doPub=!!(change.pub||change.meta), doPriv=!!change.priv;
+    var doPub=!!(change.pub||change.meta), doPriv=!!change.priv, steps=[];
     if(doPriv&&doPub&&change.priv.length>priv.length)steps=[privStep,pubStep];
     else{if(doPub)steps.push(pubStep);if(doPriv)steps.push(privStep)}
-    steps.reduce(function(chain,step){return chain.then(step)},Promise.resolve()).then(function(){
-      try{sessionStorage.removeItem(DRAFT)}catch(e){}
-      if(done)done();
+    return steps.reduce(function(c,s){return c.then(s)},Promise.resolve()).then(function(){
       busy=false;
-      msg=doPub?'تم الحفظ. التغييرات العامة تظهر للزوار خلال دقيقة أو دقيقتين.':'تم الحفظ. القصيدة الخاصة لا يراها أحد غيرك.';
-      render();
+      if(after)after();
+      render();toast(okText);
     },function(code){
-      busy=false;msgErr=true;
-      if(code==='conflict'){msg='تغيّر الملف من مكان آخر. حمّلت أحدث نسخة، أعد المحاولة.';loadOwner().then(render,render);return}
-      if(code==='auth')msg=doPriv?'المفتاح لا يملك صلاحية الكتابة على '+PRIV_REPO+' أو انتهت صلاحيته.':'المفتاح لم يعد صالحًا. اخرج وادخل بمفتاح جديد.';
-      else msg='تعذّر الحفظ. مسودتك محفوظة، جرّب مرة أخرى.';
+      busy=false;
+      if(code==='conflict'){toast('تغيّر الديوان من مكان آخر. حمّلت أحدث نسخة، أعد المحاولة.',true);loadOwner().then(render,render);return}
+      if(code==='auth')toast(doPriv?'المفتاح لا يملك صلاحية الكتابة على '+PRIV_REPO+' أو انتهت صلاحيته.':'المفتاح لم يعد صالحًا. اخرج وادخل بمفتاح جديد.',true);
+      else toast('تعذّر الحفظ. ما كتبته باقٍ هنا، جرّب مرة أخرى.',true);
       render();
     });
   }
-
-  // Build the change that puts poem `np` (same id as an existing one, or new) into the chosen list.
   function placeChange(np,toPriv){
     var cur=findPoem(np.id), change={};
     var P=pub.filter(function(p){return p.id!==np.id}), Q=priv.filter(function(p){return p.id!==np.id});
@@ -298,51 +280,265 @@ article.poem.is-priv::before{opacity:.2}
     return change;
   }
 
-  root.addEventListener('click',function(e){
-    var b=e.target.closest('button[data-act]');if(!b)return;
-    var a=b.dataset.act,id=b.dataset.id;
-    if(a==='new'){editing='new';editingHead=false}
-    else if(a==='edit'){editing=id;editingHead=false}
-    else if(a==='head'){editingHead=!editingHead;editing=null}
-    else if(a==='cancel'){editing=null;editingHead=false;try{sessionStorage.removeItem(DRAFT)}catch(x){}}
-    else if(a==='del'){confirmDel=id}
-    else if(a==='del-no'){confirmDel=null}
-    else if(a==='del-yes'){
-      var f=findPoem(id);confirmDel=null;if(!f)return;
-      save(f.priv?{priv:priv.filter(function(p){return p.id!==id})}:{pub:pub.filter(function(p){return p.id!==id})});return;
+  // ---------- routing ----------
+  function route(){
+    var h=location.hash;
+    if(h.indexOf('#p-')===0)return {view:'poem',id:decodeURIComponent(h.slice(3))};
+    if(h==='#write')return {view:isOwner?'index':'login'};
+    return {view:'index'};
+  }
+
+  // ---------- pieces ----------
+  function verses(text){
+    var out='';
+    String(text).replace(/\r/g,'').split('\n').forEach(function(l){
+      var t=l.trim();
+      if(!t){out+='<div class="gap"></div>';return}
+      var i=t.indexOf('*');
+      if(i>-1){out+='<div class="bayt"><span class="sadr">'+esc(t.slice(0,i).trim())+'</span><span class="sep" aria-hidden="true">✦</span><span class="ajz">'+esc(t.slice(i+1).trim())+'</span></div>'}
+      else out+='<div class="free">'+esc(t)+'</div>';
+    });
+    return out;
+  }
+  function excerpt(text){
+    var lines=String(text).split('\n').map(function(l){return l.trim()}).filter(Boolean).slice(0,2);
+    return lines.map(function(l){return l.replace(/\s*\*\s*/,'  ✦  ')}).join(' ، ');
+  }
+  function masthead(){
+    var n=pub.length, c=n?plural(n):'';
+    if(isOwner&&priv.length)c+=(c?' · ':'')+priv.length+' خاصة';
+    return '<header class="mast"><div class="orn" aria-hidden="true">۞</div><div class="name-wrap"><span class="rule l" aria-hidden="true"></span><h1>'+esc(meta.name)+'</h1><span class="rule r" aria-hidden="true"></span></div>'+
+      (meta.tagline?'<p class="tag">'+esc(meta.tagline)+'</p>':'')+(c?'<div class="count">'+esc(c)+'</div>':'')+'</header>';
+  }
+  function ownerBar(){
+    return '<div class="bar"><span class="who"><span class="dot" aria-hidden="true"></span>وضع الكتابة</span><div class="btns">'+
+      '<button class="primary" data-act="new"'+(mode||busy?' disabled':'')+'>+ قصيدة جديدة</button>'+
+      '<button class="ghost" data-act="head"'+(mode||busy?' disabled':'')+'>تعديل العنوان</button>'+
+      '<button class="ghost" data-act="logout">خروج</button></div></div>';
+  }
+  var ICON_SEARCH='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>';
+
+  function indexView(){
+    var all=shown(), h='';
+    if(!loaded){
+      return loadErr?'<div class="empty">تعذّر تحميل القصائد<small>تأكد من اتصالك ثم حدّث الصفحة.</small></div>'
+        :'<div class="grid" aria-busy="true"><div class="skel"></div><div class="skel"></div></div>';
     }
-    else if(a==='flip'){var g=findPoem(id);if(g)save(placeChange(clone(g.p),!g.priv));return}
-    else if(a==='logout'){try{localStorage.removeItem(TOKEN_KEY)}catch(x){}token=null;isOwner=false;privOk=false;priv=[];editing=null;editingHead=false;history.replaceState(null,'',location.pathname);loadPublic().then(render);}
-    msg='';msgErr=false;render();
-    var fe=root.querySelector('#ed-title,#hd-name');if(fe)fe.focus();
+    if(!all.length){
+      return '<div class="empty">لم تُنشر قصائد بعد'+(isOwner?'<small>ابدأ بأول قصيدة، وستظهر هنا.</small><button class="primary" data-act="new">+ اكتب أول قصيدة</button>':'<small>عُد قريبًا.</small>')+'</div>';
+    }
+    var showSearch=all.length>=6, showChips=isOwner&&priv.length>0;
+    if(showSearch||showChips){
+      h+='<div class="toolbar">'+
+        (showSearch?'<label class="search" for="q"><span class="sr">ابحث في القصائد</span>'+ICON_SEARCH+'<input id="q" type="search" placeholder="ابحث بعنوان أو كلمة…" value="'+esc(query)+'"></label>':'')+
+        (showChips?'<div class="chips" role="group" aria-label="عرض">'+
+          [['all','الكل'],['pub','العامة'],['priv','الخاصة']].map(function(c){return '<button class="chip" data-act="filter" data-v="'+c[0]+'" aria-pressed="'+(filter===c[0])+'">'+c[1]+'</button>'}).join('')+'</div>':'')+
+        '</div>';
+    }
+    var q=query.trim(), list=all.filter(function(it){
+      if(filter==='pub'&&it.priv)return false;
+      if(filter==='priv'&&!it.priv)return false;
+      return !q||it.p.title.indexOf(q)>-1||it.p.text.indexOf(q)>-1;
+    });
+    if(!list.length)return h+'<div class="empty">لا توجد قصيدة تطابق بحثك<small>جرّب كلمة أخرى.</small></div>';
+    h+='<div class="grid">'+list.map(function(it){
+      return '<a class="card'+(it.priv?' is-priv':'')+'" href="#p-'+encodeURIComponent(it.p.id)+'"><h3>'+esc(it.p.title)+'</h3>'+
+        '<p class="excerpt">'+esc(excerpt(it.p.text))+'</p>'+
+        '<div class="card-foot"><span>'+esc(fmtDate(it.p.date))+'</span>'+(it.priv?'<span class="pill">خاصة</span>':'')+'</div></a>';
+    }).join('')+'</div>';
+    return h;
+  }
+
+  function poemView(id){
+    var it=findPoem(id);
+    var top='<nav class="topnav" aria-label="تنقل"><a class="back" href="#">→ كل القصائد</a><a class="mini-name" href="#">'+esc(meta.name)+'</a></nav>';
+    if(!loaded)return top+'<div class="skel" style="height:420px"></div>';
+    if(!it)return top+'<div class="empty">هذه القصيدة غير موجودة<small>ربما حُذفت أو لم تعد متاحة.</small><a class="btn" href="#">العودة إلى الديوان</a></div>';
+    var p=it.p, list=shown(), i=-1;
+    for(var k=0;k<list.length;k++)if(list[k].p.id===id){i=k;break}
+    var newer=list[i-1], older=list[i+1];
+    var tools='<div class="reader-tools"><div class="sizer" role="group" aria-label="حجم الخط"><button data-act="size" data-v="-1" aria-label="تصغير الخط">أ−</button><button data-act="size" data-v="1" aria-label="تكبير الخط">أ+</button></div>'+
+      (it.priv?'':'<button class="ghost" data-act="copy">نسخ رابط القصيدة</button>')+'</div>';
+    var own='';
+    if(isOwner){
+      own=confirmDel
+        ?'<div class="owner-tools"><div class="confirm" role="alert">حذف «'+esc(p.title)+'» نهائيًا؟<button class="danger" data-act="del-yes"'+(busy?' disabled':'')+'>نعم، احذف</button><button class="ghost" data-act="del-no">تراجع</button></div></div>'
+        :'<div class="owner-tools"><button data-act="edit"'+(busy?' disabled':'')+'>تعديل</button>'+
+          '<button data-act="flip"'+(busy||!privOk?' disabled':'')+'>'+(it.priv?'اجعلها عامة':'اجعلها خاصة')+'</button>'+
+          '<button class="danger" data-act="del"'+(busy?' disabled':'')+'>حذف</button></div>';
+    }
+    var pager='';
+    if(newer||older){
+      pager='<nav class="pager" aria-label="قصائد أخرى">'+
+        (newer?'<a href="#p-'+encodeURIComponent(newer.p.id)+'"><span class="lbl">→ الأحدث</span><span class="ttl">'+esc(newer.p.title)+'</span></a>':'<span></span>')+
+        (older?'<a class="next" href="#p-'+encodeURIComponent(older.p.id)+'"><span class="lbl">الأقدم ←</span><span class="ttl">'+esc(older.p.title)+'</span></a>':'')+
+        '</nav>';
+    }
+    return top+'<article class="poem'+(it.priv?' is-priv':'')+'">'+
+      (it.priv?'<div class="pill-row"><span class="pill">خاصة · لا يراها غيرك</span></div>':'')+
+      '<h2>'+esc(p.title)+'</h2><div class="meta">'+esc(fmtDate(p.date))+'</div>'+
+      '<div class="verses">'+verses(p.text)+'</div><div class="end" aria-hidden="true">۞</div>'+own+'</article>'+tools+pager;
+  }
+
+  function editorView(){
+    var isNew=editId==='new', d=draft;
+    return '<form class="editor" id="ed" novalidate><h2>'+(isNew?'قصيدة جديدة':'تعديل القصيدة')+'</h2>'+
+      '<label for="ed-title">العنوان<input id="ed-title" maxlength="120" value="'+esc(d.title)+'" placeholder="عنوان القصيدة"></label>'+
+      '<div class="field-head"><span class="hint">من يراها؟</span><div class="seg" role="group" aria-label="من يرى القصيدة">'+
+        '<button type="button" data-act="vis" data-v="pub" aria-pressed="'+(!d.priv)+'">الجميع</button>'+
+        '<button type="button" data-act="vis" data-v="priv" aria-pressed="'+(!!d.priv)+'"'+(privOk?'':' disabled')+'>أنا فقط</button></div></div>'+
+      (privOk?'':'<p class="warn">مفتاحك لا يملك صلاحية على '+PRIV_REPO+'، لذلك «أنا فقط» غير متاح الآن.</p>')+
+      '<div class="field-head"><div class="tabs" role="tablist">'+
+        '<button type="button" role="tab" data-act="tab" data-v="write" aria-selected="'+(edTab==='write')+'">كتابة</button>'+
+        '<button type="button" role="tab" data-act="tab" data-v="preview" aria-selected="'+(edTab==='preview')+'">معاينة</button></div>'+
+        (edTab==='write'?'<button type="button" class="ghost" data-act="sep" title="يفصل الصدر عن العجز">إدراج فاصل الشطرين ✦</button>':'')+'</div>'+
+      (edTab==='write'
+        ?'<label for="ed-text" class="sr">الأبيات</label><textarea id="ed-text" placeholder="اكتب الأبيات هنا، بيتًا في كل سطر">'+esc(d.text)+'</textarea>'+
+          '<p class="hint">في البيت العمودي ضع <code>*</code> بين الصدر والعجز، أو استخدم زر «إدراج فاصل الشطرين». السطر الفارغ يفصل بين المقاطع.</p>'
+        :'<div class="preview">'+(d.text.trim()?'<h2 style="font-family:var(--f-head);color:var(--gold);text-align:center;margin:0 0 20px;font-weight:500">'+esc(d.title||'بلا عنوان')+'</h2><div class="verses">'+verses(d.text)+'</div>':'<p class="hint" style="text-align:center">اكتب شيئًا لترى معاينته هنا.</p>')+'</div>')+
+      '<p class="err-text" id="ed-err" role="alert"></p>'+
+      '<div class="row"><button type="submit" class="primary"'+(busy?' disabled':'')+'>'+(busy?'جارٍ الحفظ…':(d.priv?'حفظ':'نشر'))+'</button><button type="button" class="ghost" data-act="cancel">إلغاء</button><span class="kbd">Ctrl + S للحفظ</span></div></form>';
+  }
+
+  function headView(){
+    return '<form class="editor" id="hd"><h2>عنوان الديوان</h2><label for="hd-name">الاسم<input id="hd-name" required maxlength="60" value="'+esc(meta.name)+'"></label>'+
+      '<label for="hd-tag">سطر التعريف<input id="hd-tag" maxlength="140" value="'+esc(meta.tagline)+'"></label>'+
+      '<div class="row"><button type="submit" class="primary"'+(busy?' disabled':'')+'>'+(busy?'جارٍ الحفظ…':'حفظ')+'</button><button type="button" class="ghost" data-act="cancel">إلغاء</button></div></form>';
+  }
+
+  function loginView(){
+    return masthead()+'<form class="editor" id="login"><h2>دخول صاحب الديوان</h2>'+
+      '<label for="tok">مفتاح GitHub<input id="tok" class="ltr" type="password" autocomplete="off" spellcheck="false" required></label>'+
+      '<p class="hint">المفتاح يُحفظ في هذا المتصفح فقط. أنشئه من <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">إعدادات GitHub</a>: اختر المستودعين <code>'+REPO+'</code> و<code>'+PRIV_REPO+'</code>، وصلاحية Contents: Read and write.</p>'+
+      (loginErr?'<p class="err-text" role="alert">'+esc(loginErr)+'</p>':'')+
+      '<div class="row"><button type="submit" class="primary"'+(busy?' disabled':'')+'>'+(busy?'جارٍ التحقق…':'دخول')+'</button><a class="btn" href="#" style="border-color:transparent;color:var(--ink-soft)">العودة للديوان</a></div></form>';
+  }
+
+  // ---------- render ----------
+  function render(){
+    var r=route(), h='';
+    document.documentElement.style.setProperty('--scale',scale);
+    if(isOwner)h+=ownerBar();
+    if(isOwner&&mode==='edit')h+=editorView();
+    else if(isOwner&&mode==='head')h+=masthead()+headView();
+    else if(r.view==='login')h+=loginView();
+    else if(r.view==='poem')h+=poemView(r.id);
+    else h+=masthead()+indexView();
+    h+='<footer>جميع القصائد محفوظة لكاتبها</footer>';
+    var a=document.activeElement, keep=a&&a.id==='q'?[a.selectionStart,a.selectionEnd]:null;
+    root.innerHTML=h;
+    if(keep){var q=document.getElementById('q');if(q){q.focus();q.setSelectionRange(keep[0],keep[1])}}
+    var it=r.view==='poem'&&!mode?findPoem(r.id):null;
+    document.title=it?it.p.title+' · '+meta.name:(meta.name||'ديواني');
+  }
+
+  // ---------- editing ----------
+  function startEdit(id){
+    var it=id==='new'?null:findPoem(id);
+    draft=it?{title:it.p.title,text:it.p.text,priv:it.priv}:{title:'',text:'',priv:false};
+    try{var dr=JSON.parse(sessionStorage.getItem(DRAFT)||'null');if(dr&&dr.id===id)draft={title:dr.title,text:dr.text,priv:!!dr.priv&&privOk}}catch(e){}
+    mode='edit';editId=id;edTab='write';dirty=false;render();window.scrollTo(0,0);
+    var f=document.getElementById(id==='new'?'ed-title':'ed-text');if(f)f.focus();
+  }
+  function readDraft(){
+    var t=document.getElementById('ed-title'),x=document.getElementById('ed-text');
+    if(t)draft.title=t.value;if(x)draft.text=x.value;
+  }
+  function stashDraft(){try{sessionStorage.setItem(DRAFT,JSON.stringify({id:editId,title:draft.title,text:draft.text,priv:draft.priv}))}catch(e){}}
+  function endEdit(){mode=null;editId=null;draft=null;dirty=false;try{sessionStorage.removeItem(DRAFT)}catch(e){}}
+  function submitPoem(){
+    readDraft();
+    var t=draft.title.trim(),x=draft.text.replace(/\s+$/,'');
+    if(!t||!x.trim()){
+      if(edTab!=='write'){edTab='write';render()}
+      var err=document.getElementById('ed-err');if(err)err.textContent=!t?'اكتب عنوان القصيدة.':'اكتب الأبيات قبل النشر.';
+      var f=document.getElementById(!t?'ed-title':'ed-text');if(f)f.focus();return;
+    }
+    var old=editId==='new'?null:findPoem(editId), pv=!!draft.priv&&privOk;
+    var np=old?{id:old.p.id,title:t,text:x,date:old.p.date}:{id:Date.now().toString(36),title:t,text:x,date:new Date().toISOString()};
+    var ok=pv?'حُفظت القصيدة. لا يراها أحد غيرك.':(old?'حُفظ التعديل. يظهر للزوار خلال دقيقة أو دقيقتين.':'نُشرت القصيدة. تظهر للزوار خلال دقيقة أو دقيقتين.');
+    save(placeChange(np,pv),ok,function(){endEdit();if(location.hash!=='#p-'+np.id)history.pushState(null,'','#p-'+np.id);window.scrollTo(0,0)});
+  }
+
+  // ---------- events ----------
+  root.addEventListener('click',function(e){
+    var b=e.target.closest('[data-act]');if(!b)return;
+    var a=b.dataset.act, r=route();
+    if(a==='new'){startEdit('new');return}
+    if(a==='edit'){startEdit(r.id);return}
+    if(a==='head'){mode='head';render();var f=document.getElementById('hd-name');if(f)f.focus();return}
+    if(a==='cancel'){
+      if(mode==='edit'&&dirty&&!confirm('تجاهل التغييرات التي لم تُحفظ؟'))return;
+      endEdit();render();return;
+    }
+    if(a==='tab'){readDraft();edTab=b.dataset.v;render();return}
+    if(a==='vis'){readDraft();draft.priv=b.dataset.v==='priv';dirty=true;stashDraft();render();return}
+    if(a==='sep'){
+      var ta=document.getElementById('ed-text');if(!ta)return;
+      ta.setRangeText(' * ',ta.selectionStart,ta.selectionEnd,'end');ta.focus();
+      readDraft();dirty=true;stashDraft();return;
+    }
+    if(a==='filter'){filter=b.dataset.v;render();return}
+    if(a==='size'){scale=Math.min(1.5,Math.max(.8,Math.round((scale+.1*parseInt(b.dataset.v,10))*10)/10));try{localStorage.setItem(SCALE_KEY,scale)}catch(x){}render();return}
+    if(a==='copy'){
+      var url=location.href;
+      if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(url).then(function(){toast('نُسخ رابط القصيدة.')},function(){toast(url)});
+      else toast(url);
+      return;
+    }
+    if(a==='del'){confirmDel=true;render();return}
+    if(a==='del-no'){confirmDel=false;render();return}
+    if(a==='del-yes'){
+      var d=findPoem(r.id);if(!d)return;
+      save(d.priv?{priv:priv.filter(function(p){return p.id!==r.id})}:{pub:pub.filter(function(p){return p.id!==r.id})},'حُذفت القصيدة.',function(){confirmDel=false;history.pushState(null,'',location.pathname)});
+      return;
+    }
+    if(a==='flip'){
+      var g=findPoem(r.id);if(!g)return;
+      save(placeChange(clone(g.p),!g.priv),g.priv?'صارت القصيدة عامة. تظهر للزوار خلال دقيقة أو دقيقتين.':'صارت القصيدة خاصة. لا يراها أحد غيرك.');
+      return;
+    }
+    if(a==='logout'){
+      try{localStorage.removeItem(TOKEN_KEY)}catch(x){}
+      token=null;isOwner=false;privOk=false;priv=[];endEdit();
+      history.pushState(null,'',location.pathname);loadPublic().then(render);render();toast('خرجت من وضع الكتابة.');return;
+    }
   });
   root.addEventListener('input',function(e){
-    if(!e.target.closest('#ed'))return;
-    try{sessionStorage.setItem(DRAFT,JSON.stringify({id:editing,title:document.getElementById('ed-title').value,text:document.getElementById('ed-text').value,priv:document.getElementById('ed-priv').checked}))}catch(x){}
+    if(e.target.id==='q'){query=e.target.value;render();return}
+    if(e.target.closest('#ed')){readDraft();dirty=true;stashDraft();var er=document.getElementById('ed-err');if(er)er.textContent=''}
   });
   root.addEventListener('submit',function(e){
     e.preventDefault();
-    if(e.target.id==='login'){
+    var id=e.target.id;
+    if(id==='login'){
       token=document.getElementById('tok').value.trim();if(!token)return;
-      busy=true;msg='جارٍ التحقق…';msgErr=false;render();
+      busy=true;loginErr='';render();
       checkToken().then(function(){
         try{localStorage.setItem(TOKEN_KEY,token)}catch(x){}
-        busy=false;msg='';render();
+        busy=false;history.replaceState(null,'',location.pathname);render();toast('أهلًا بك. تقدر تكتب الآن.');
       },function(){
-        token=null;isOwner=false;busy=false;msgErr=true;msg='المفتاح غير صحيح أو لا يملك صلاحية الكتابة على المستودع '+REPO+'.';render();
+        token=null;isOwner=false;busy=false;loginErr='المفتاح غير صحيح أو لا يملك صلاحية الكتابة على المستودع '+REPO+'.';render();
       });
       return;
     }
-    if(e.target.id==='hd'){
-      save({meta:{name:document.getElementById('hd-name').value.trim()||meta.name,tagline:document.getElementById('hd-tag').value.trim()}},function(){editingHead=false});return;
+    if(id==='hd'){
+      save({meta:{name:document.getElementById('hd-name').value.trim()||meta.name,tagline:document.getElementById('hd-tag').value.trim()}},'حُفظ العنوان.',function(){mode=null});
+      return;
     }
-    var t=document.getElementById('ed-title').value.trim(),x=document.getElementById('ed-text').value.replace(/\s+$/,''),pv=document.getElementById('ed-priv').checked&&privOk;
-    if(!t||!x.trim()){msg='اكتب العنوان والأبيات قبل النشر.';msgErr=true;render();return}
-    var old=editing==='new'?null:findPoem(editing);
-    var np=old?{id:old.p.id,title:t,text:x,date:old.p.date}:{id:Date.now().toString(36),title:t,text:x,date:new Date().toISOString()};
-    save(placeChange(np,pv),function(){editing=null});
+    if(id==='ed')submitPoem();
   });
-  window.addEventListener('hashchange',function(){if(!isOwner)render()});
+  document.addEventListener('keydown',function(e){
+    if(mode==='edit'&&(e.ctrlKey||e.metaKey)&&(e.key==='s'||e.key==='S')){e.preventDefault();if(!busy)submitPoem()}
+    if(e.key==='Escape'&&mode==='head'){mode=null;render()}
+  });
+  window.addEventListener('beforeunload',function(e){if(mode==='edit'&&dirty){e.preventDefault();e.returnValue=''}});
+  function onNav(){
+    if(mode==='edit'&&dirty)stashDraft();
+    mode=null;confirmDel=false;render();window.scrollTo(0,0);
+  }
+  window.addEventListener('hashchange',onNav);
+  window.addEventListener('popstate',onNav);
 
   render();
   if(token){
