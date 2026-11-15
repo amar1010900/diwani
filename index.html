@@ -16,18 +16,29 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%232a1a12'/%3E%3Ctext x='32' y='46' font-size='40' text-anchor='middle' fill='%23d4a94e' font-family='serif'%3E%DB%9E%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Aref+Ruqaa:wght@400;700&family=Reem+Kufi:wght@500;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@700&display=swap">
+<link rel="preload" href="fonts/thmanyahserifdisplay-Black.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/thmanyahseriftext-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <style>
+@font-face{font-family:"Thmanyah Serif Display";src:local("thmanyah serif display Medium"),url(fonts/thmanyahserifdisplay-Medium.woff2) format("woff2");font-weight:500;font-display:swap}
+@font-face{font-family:"Thmanyah Serif Display";src:local("thmanyah serif display Bold"),url(fonts/thmanyahserifdisplay-Bold.woff2) format("woff2");font-weight:700;font-display:swap}
+@font-face{font-family:"Thmanyah Serif Display";src:local("thmanyah serif display Black"),url(fonts/thmanyahserifdisplay-Black.woff2) format("woff2");font-weight:900;font-display:swap}
+@font-face{font-family:"Thmanyah Serif Text";src:local("thmanyah serif text Regular"),url(fonts/thmanyahseriftext-Regular.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"Thmanyah Serif Text";src:local("thmanyah serif text Bold"),url(fonts/thmanyahseriftext-Bold.woff2) format("woff2");font-weight:700;font-display:swap}
+@font-face{font-family:"Thmanyah Sans";src:local("thmanyah sans Regular"),url(fonts/thmanyahsans-Regular.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"Thmanyah Sans";src:local("thmanyah sans Medium"),url(fonts/thmanyahsans-Medium.woff2) format("woff2");font-weight:500;font-display:swap}
+@font-face{font-family:"Thmanyah Sans";src:local("thmanyah sans Bold"),url(fonts/thmanyahsans-Bold.woff2) format("woff2");font-weight:600 700;font-display:swap}
 /* Layout: a bound diwan. The home page is its table of contents (cards); each poem opens on its own leather sheet framed by a thin gold rule. */
 :root{
   --bg:#2a1a12; --bg-2:#3a2519; --sheet:#4a3022; --sheet-edge:#5e3e2c; --sheet-hi:#56382a;
   --ink:#f1e4d2; --ink-soft:#c9b29a; --ink-faint:#9a8069;
   --gold:#d4a94e; --gold-soft:#a9843a; --gold-hi:#e9c977; --danger:#e08a6e; --ok:#9fbf7a;
-  /* Thmanyah fonts are used when installed on the reader's device (they are never uploaded here); otherwise the web fonts take over. */
-  --f-poem:"thmanyah serif text","Amiri","Noto Naskh Arabic","Times New Roman",serif;
-  --f-name:"Aref Ruqaa","Amiri",serif;
-  --f-head:"thmanyah serif display","Reem Kufi","Amiri",serif;
-  --f-ui:"thmanyah sans","IBM Plex Sans Arabic","Segoe UI",Tahoma,sans-serif;
+  /* Thmanyah type family, served from fonts/ (use approved by Thmanyah). Aref Ruqaa stays for the poet's handwritten-style signature. */
+  --f-poem:"Thmanyah Serif Text","Noto Naskh Arabic","Times New Roman",serif;
+  --f-display:"Thmanyah Serif Display","Thmanyah Serif Text",serif;
+  --f-name:"Aref Ruqaa","Thmanyah Serif Display",serif;
+  --f-head:"Thmanyah Serif Display","Thmanyah Serif Text",serif;
+  --f-ui:"Thmanyah Sans","Segoe UI",Tahoma,sans-serif;
   --scale:1;
   color-scheme:dark;
 }
@@ -49,14 +60,11 @@ header.mast{text-align:center;display:flex;flex-direction:column;align-items:cen
 .rule.r{background:linear-gradient(to right,transparent,var(--gold-soft) 40%,var(--gold))}
 .rule::after{content:"";position:absolute;top:50%;width:7px;height:7px;background:var(--gold);transform:translateY(-50%) rotate(45deg)}
 .rule.l::after{left:-3px}.rule.r::after{right:-3px}
-h1{font-family:var(--f-name);font-weight:700;font-size:clamp(64px,16vw,112px);line-height:1.35;margin:0;padding-inline:.08em;text-wrap:balance;
+h1{font-family:var(--f-display);font-weight:900;font-size:clamp(72px,18vw,124px);line-height:1.25;margin:0;padding-inline:.08em;text-wrap:balance;
   color:var(--gold);background:linear-gradient(100deg,#9c7330 0%,var(--gold-hi) 28%,#fff1c4 45%,var(--gold) 60%,#8f6828 100%);background-size:220% 100%;background-position:100% 0;
   -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
   filter:drop-shadow(0 2px 0 rgba(0,0,0,.45)) drop-shadow(0 0 22px rgba(212,169,78,.25))}
 @media (prefers-reduced-motion:no-preference){h1{animation:gild 2.8s ease-out .2s both}@keyframes gild{from{background-position:0 0}to{background-position:100% 0}}}
-h1.has-img{background:none;filter:none;animation:none;-webkit-text-fill-color:initial;line-height:0;padding:0}
-.name-img{display:block;height:clamp(104px,24vw,172px);width:auto;max-width:100%;filter:drop-shadow(0 0 24px rgba(212,169,78,.22))}
-.mini-img{display:block;height:46px;width:auto}
 .tag{font-family:var(--f-poem);font-size:21px;color:var(--ink-soft);margin:0;text-wrap:balance}
 .count{font-size:13px;color:var(--ink-faint)}
 .byline{margin:0;font-family:var(--f-poem);font-size:19px;color:var(--ink-faint);display:flex;align-items:center;gap:10px}
@@ -69,7 +77,7 @@ h1.has-img{background:none;filter:none;animation:none;-webkit-text-fill-color:in
 
 /* small header on a poem page */
 .topnav{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.mini-name{font-family:var(--f-name);font-weight:700;font-size:34px;line-height:1.2;color:var(--gold);text-decoration:none}
+.mini-name{font-family:var(--f-display);font-weight:900;font-size:36px;line-height:1.2;color:var(--gold);text-decoration:none}
 .back{display:inline-flex;align-items:center;gap:8px;color:var(--ink-soft);text-decoration:none;font-size:15px;padding:6px 2px;border-bottom:1px solid transparent}
 .back:hover{color:var(--gold);border-color:var(--gold-soft)}
 
@@ -181,7 +189,7 @@ footer{text-align:center;font-size:13px;color:var(--ink-faint)}
 </style>
 </head>
 <body>
-<div id="root"><header class="mast"><div class="orn" aria-hidden="true">۞</div><div class="name-wrap"><span class="rule l" aria-hidden="true"></span><h1 class="has-img"><img class="name-img" src="assets/name.png" alt="ديواني" width="870" height="548"></h1><span class="rule r" aria-hidden="true"></span></div></header></div>
+<div id="root"><header class="mast"><div class="orn" aria-hidden="true">۞</div><div class="name-wrap"><span class="rule l" aria-hidden="true"></span><h1>ديواني</h1><span class="rule r" aria-hidden="true"></span></div></header></div>
 <div id="toast" role="status" aria-live="polite"></div>
 <script>
 (function(){
@@ -323,14 +331,8 @@ footer{text-align:center;font-size:13px;color:var(--ink-faint)}
     var lines=String(text).split('\n').map(function(l){return l.trim()}).filter(Boolean).slice(0,2);
     return lines.map(function(l){return l.replace(/\s*\*\s*/,'  ✦  ')}).join(' ، ');
   }
-  // The default name is drawn as an image in Thmanyah Serif Display; a renamed diwan falls back to live text.
-  var NAME_IMG='ديواني';
-  function nameTitle(){
-    return meta.name===NAME_IMG?'<h1 class="has-img"><img class="name-img" src="assets/name.png" alt="'+esc(meta.name)+'" width="870" height="548"></h1>':'<h1>'+esc(meta.name)+'</h1>';
-  }
-  function miniName(){
-    return '<a class="mini-name" href="#">'+(meta.name===NAME_IMG?'<img class="mini-img" src="assets/name-small.png" alt="'+esc(meta.name)+'" width="289" height="180">':esc(meta.name))+'</a>';
-  }
+  function nameTitle(){return '<h1>'+esc(meta.name)+'</h1>'}
+  function miniName(){return '<a class="mini-name" href="#">'+esc(meta.name)+'</a>'}
   function masthead(){
     var n=pub.length, c=n?plural(n):'';
     if(isOwner&&priv.length)c+=(c?' · ':'')+priv.length+' خاصة';
