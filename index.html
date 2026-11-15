@@ -442,7 +442,7 @@ footer{text-align:center;font-size:13px;color:var(--ink-faint)}
     else if(r.view==='login')h+=loginView();
     else if(r.view==='poem')h+=poemView(r.id);
     else h+=masthead()+indexView();
-    h+='<footer class="rights"><span>© '+new Date().getFullYear()+' '+esc(AUTHOR)+'. جميع الحقوق محفوظة.</span><span>لا يجوز نقل القصائد أو نشرها دون ذكر اسم الشاعر.</span></footer>';
+    h+='<footer class="rights"><span>© '+new Date().getFullYear()+' '+esc(AUTHOR)+'. جميع الحقوق محفوظة.</span></footer>';
     var a=document.activeElement, keep=a&&a.id==='q'?[a.selectionStart,a.selectionEnd]:null;
     root.innerHTML=h;
     if(keep){var q=document.getElementById('q');if(q){q.focus();q.setSelectionRange(keep[0],keep[1])}}
