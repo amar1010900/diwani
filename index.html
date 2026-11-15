@@ -86,19 +86,27 @@ textarea{font-family:var(--f-poem);font-size:20px;line-height:1.9;min-height:260
 .status.err{color:var(--danger)}
 footer{text-align:center;font-size:13px;color:var(--ink-faint)}
 @media (prefers-reduced-motion:no-preference){article.poem{animation:rise .5s ease both}@keyframes rise{from{transform:translateY(8px)}to{transform:none}}}
+article.poem.is-priv{background:var(--bg-2);border-style:dashed;border-color:var(--gold-soft)}
+article.poem.is-priv::before{opacity:.2}
+.badge{display:inline-flex;align-items:center;gap:6px;font-family:var(--f-ui);font-size:12px;font-weight:500;color:var(--bg);background:var(--gold-soft);border-radius:999px;padding:2px 10px;margin:0 auto 10px}
+.badge-row{display:flex;justify-content:center}
+.check{flex-direction:row;align-items:center;gap:10px;color:var(--ink);font-size:15px;cursor:pointer}
+.check input{width:18px;height:18px;margin:0;accent-color:var(--gold)}
+.warn{font-size:13px;color:var(--danger);margin:0}
 </style>
 </head>
 <body>
 <div id="root"><header class="mast"><div class="orn" aria-hidden="true">۞</div><div class="name-wrap"><span class="rule l" aria-hidden="true"></span><h1>ديواني</h1><span class="rule r" aria-hidden="true"></span></div></header></div>
 <script>
 (function(){
-  // Where the poems live. Only someone with write access to this repository can save.
-  var OWNER='amar1010900', REPO='diwani', FILE='poems.json';
-  var API='https://api.github.com/repos/'+OWNER+'/'+REPO;
+  // Public poems live in this site's repository (anyone can read them).
+  // Private poems live in a separate PRIVATE repository that only the owner's key can open.
+  var OWNER='amar1010900', REPO='diwani', FILE='poems.json', PRIV_REPO='diwani-private', PRIV_FILE='private.json';
   var TOKEN_KEY='diwani-token', DRAFT='diwani-draft';
+  function api(repo){return 'https://api.github.com/repos/'+OWNER+'/'+repo}
 
   var root=document.getElementById('root');
-  var state={name:'ديواني',tagline:'',poems:[]}, sha=null, loaded=false, loadErr=false;
+  var meta={name:'ديواني',tagline:''}, pub=[], priv=[], shaPub=null, shaPriv=null, privOk=false, loaded=false, loadErr=false;
   var token=null, isOwner=false, editing=null, confirmDel=null, editingHead=false, busy=false, msg='', msgErr=false;
   try{token=localStorage.getItem(TOKEN_KEY)}catch(e){}
 
@@ -106,10 +114,23 @@ footer{text-align:center;font-size:13px;color:var(--ink-faint)}
   function fmtDate(iso){try{return new Date(iso).toLocaleDateString('ar-SA-u-ca-gregory',{year:'numeric',month:'long',day:'numeric'})}catch(e){return ''}}
   function toB64(str){var b=new TextEncoder().encode(str),s='';for(var i=0;i<b.length;i+=0x8000)s+=String.fromCharCode.apply(null,b.subarray(i,i+0x8000));return btoa(s)}
   function fromB64(b64){var bin=atob(b64.replace(/\s/g,''));var u=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return new TextDecoder().decode(u)}
-  function gh(path,opts){
+  function gh(url,opts){
     opts=opts||{};opts.headers={'Accept':'application/vnd.github+json','Authorization':'Bearer '+token,'X-GitHub-Api-Version':'2022-11-28'};
     opts.cache='no-store';
-    return fetch(API+path,opts);
+    return fetch(url,opts);
+  }
+  function clone(a){return JSON.parse(JSON.stringify(a))}
+
+  // Every poem on screen, newest first. Visitors only ever have the public list.
+  function shown(){
+    var a=pub.map(function(p){return {p:p,priv:false}});
+    if(isOwner)a=a.concat(priv.map(function(p){return {p:p,priv:true}}));
+    return a.sort(function(x,y){return String(y.p.date).localeCompare(String(x.p.date))});
+  }
+  function findPoem(id){
+    for(var i=0;i<pub.length;i++)if(pub[i].id===id)return {p:pub[i],priv:false};
+    for(var j=0;j<priv.length;j++)if(priv[j].id===id)return {p:priv[j],priv:true};
+    return null;
   }
 
   function verses(text){
@@ -124,37 +145,45 @@ footer{text-align:center;font-size:13px;color:var(--ink-faint)}
     return out;
   }
 
-  function editorForm(p){
-    var d=p||{title:'',text:''};
-    try{var dr=JSON.parse(sessionStorage.getItem(DRAFT)||'null');if(dr&&dr.id===(p?p.id:'new')){d=dr}}catch(e){}
-    return '<form class="editor" id="ed"><h3>'+(p?'تعديل القصيدة':'قصيدة جديدة')+'</h3>'+
+  function editorForm(item){
+    var d=item?{title:item.p.title,text:item.p.text,priv:item.priv}:{title:'',text:'',priv:false};
+    try{var dr=JSON.parse(sessionStorage.getItem(DRAFT)||'null');if(dr&&dr.id===(item?item.p.id:'new')){d=dr}}catch(e){}
+    return '<form class="editor" id="ed"><h3>'+(item?'تعديل القصيدة':'قصيدة جديدة')+'</h3>'+
       '<label for="ed-title">العنوان<input id="ed-title" required maxlength="120" value="'+esc(d.title)+'"></label>'+
       '<label for="ed-text">الأبيات<textarea id="ed-text" required>'+esc(d.text)+'</textarea></label>'+
       '<p class="hint">للبيت العمودي افصل الصدر عن العجز بعلامة <code>*</code> ، وسطر فارغ يفصل بين المقاطع.</p>'+
+      '<label class="check" for="ed-priv"><input type="checkbox" id="ed-priv"'+(d.priv?' checked':'')+(privOk?'':' disabled')+'>خاصة: لا يراها أحد غيرك</label>'+
+      (privOk?'':'<p class="warn">مفتاحك لا يملك صلاحية على المستودع '+PRIV_REPO+'، لذلك القصائد الخاصة غير متاحة الآن.</p>')+
       '<div class="row"><button type="submit" class="primary"'+(busy?' disabled':'')+'>نشر</button><button type="button" data-act="cancel">إلغاء</button></div></form>';
   }
 
   function loginForm(){
     return '<form class="editor" id="login"><h3>دخول صاحب الديوان</h3>'+
       '<label for="tok">مفتاح GitHub<input id="tok" class="ltr" type="password" autocomplete="off" spellcheck="false" required></label>'+
-      '<p class="hint">المفتاح يُحفظ في هذا المتصفح فقط. أنشئه من <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">إعدادات GitHub</a>: اختر المستودع <code>'+REPO+'</code> فقط، وصلاحية Contents: Read and write.</p>'+
+      '<p class="hint">المفتاح يُحفظ في هذا المتصفح فقط. أنشئه من <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">إعدادات GitHub</a>: اختر المستودعين <code>'+REPO+'</code> و<code>'+PRIV_REPO+'</code>، وصلاحية Contents: Read and write.</p>'+
       '<div class="row"><button type="submit" class="primary"'+(busy?' disabled':'')+'>دخول</button></div>'+
       '<div class="status'+(msgErr?' err':'')+'" role="status">'+esc(msg)+'</div></form>';
   }
 
+  function countText(){
+    var n=pub.length, s=n?n+' '+(n===1?'قصيدة':n===2?'قصيدتان':n<=10?'قصائد':'قصيدة'):'';
+    if(isOwner&&priv.length)s+=(s?' · ':'')+priv.length+' خاصة';
+    return s;
+  }
+
   function render(){
-    var n=state.poems.length;
-    var h='<header class="mast"><div class="orn" aria-hidden="true">۞</div><div class="name-wrap"><span class="rule l" aria-hidden="true"></span><h1>'+esc(state.name)+'</h1><span class="rule r" aria-hidden="true"></span></div>'+
-      (state.tagline?'<p class="tag">'+esc(state.tagline)+'</p>':'')+
-      '<div class="count">'+(n?n+' '+(n===1?'قصيدة':n===2?'قصيدتان':n<=10?'قصائد':'قصيدة'):'')+'</div></header>';
+    var list=shown();
+    var h='<header class="mast"><div class="orn" aria-hidden="true">۞</div><div class="name-wrap"><span class="rule l" aria-hidden="true"></span><h1>'+esc(meta.name)+'</h1><span class="rule r" aria-hidden="true"></span></div>'+
+      (meta.tagline?'<p class="tag">'+esc(meta.tagline)+'</p>':'')+
+      '<div class="count">'+esc(countText())+'</div></header>';
     if(isOwner){
-      h+='<div class="bar"><span class="who">أنت <b>صاحب الديوان</b>. الزوار يقرؤون فقط.</span><div class="btns">'+
+      h+='<div class="bar"><span class="who">أنت <b>صاحب الديوان</b>. الزوار يرون القصائد العامة فقط.</span><div class="btns">'+
         '<button class="primary" data-act="new"'+(editing||busy?' disabled':'')+'>قصيدة جديدة</button>'+
         '<button data-act="head"'+(busy?' disabled':'')+'>تعديل العنوان</button>'+
         '<button data-act="logout">خروج</button></div></div>';
       if(editingHead){
-        h+='<form class="editor" id="hd"><h3>عنوان الديوان</h3><label for="hd-name">الاسم<input id="hd-name" required maxlength="60" value="'+esc(state.name)+'"></label>'+
-          '<label for="hd-tag">سطر التعريف<input id="hd-tag" maxlength="140" value="'+esc(state.tagline)+'"></label>'+
+        h+='<form class="editor" id="hd"><h3>عنوان الديوان</h3><label for="hd-name">الاسم<input id="hd-name" required maxlength="60" value="'+esc(meta.name)+'"></label>'+
+          '<label for="hd-tag">سطر التعريف<input id="hd-tag" maxlength="140" value="'+esc(meta.tagline)+'"></label>'+
           '<div class="row"><button type="submit" class="primary"'+(busy?' disabled':'')+'>حفظ</button><button type="button" data-act="cancel">إلغاء</button></div></form>';
       }
       if(editing==='new')h+=editorForm(null);
@@ -162,70 +191,111 @@ footer{text-align:center;font-size:13px;color:var(--ink-faint)}
     }else if(location.hash==='#write'){
       h+=loginForm();
     }
-    if(n>2){
-      h+='<nav class="toc" aria-label="فهرس القصائد">'+state.poems.map(function(p){return '<a href="#p-'+esc(p.id)+'">'+esc(p.title)+'</a>'}).join('')+'</nav>';
+    if(list.length>2){
+      h+='<nav class="toc" aria-label="فهرس القصائد">'+list.map(function(it){return '<a href="#p-'+esc(it.p.id)+'">'+esc(it.p.title)+'</a>'}).join('')+'</nav>';
     }
     if(!loaded){
       h+='<div class="empty">'+(loadErr?'تعذّر تحميل القصائد<small>حدّث الصفحة بعد قليل.</small>':'جارٍ تحميل القصائد…')+'</div>';
-    }else if(!n){
-      h+='<div class="empty">لم تُنشر قصائد بعد'+(isOwner?'<small>اضغط «قصيدة جديدة» لكتابة أول قصيدة، وستظهر هنا للجميع.</small>':'<small>عُد قريبًا.</small>')+'</div>';
+    }else if(!list.length){
+      h+='<div class="empty">لم تُنشر قصائد بعد'+(isOwner?'<small>اضغط «قصيدة جديدة» لكتابة أول قصيدة.</small>':'<small>عُد قريبًا.</small>')+'</div>';
     }else{
-      h+='<div class="poems">'+state.poems.map(function(p){
-        if(isOwner&&editing===p.id)return editorForm(p);
+      h+='<div class="poems">'+list.map(function(it){
+        var p=it.p;
+        if(isOwner&&editing===p.id)return editorForm(it);
         var tools='';
         if(isOwner){
           tools=confirmDel===p.id
             ?'<div class="tools"><span class="hint">حذف هذه القصيدة نهائيًا؟</span><button class="danger" data-act="del-yes" data-id="'+esc(p.id)+'">نعم، احذف</button><button data-act="del-no">تراجع</button></div>'
-            :'<div class="tools"><button data-act="edit" data-id="'+esc(p.id)+'"'+(editing||busy?' disabled':'')+'>تعديل</button><button class="danger" data-act="del" data-id="'+esc(p.id)+'"'+(busy?' disabled':'')+'>حذف</button></div>';
+            :'<div class="tools"><button data-act="edit" data-id="'+esc(p.id)+'"'+(editing||busy?' disabled':'')+'>تعديل</button>'+
+              '<button data-act="flip" data-id="'+esc(p.id)+'"'+(busy||!privOk?' disabled':'')+'>'+(it.priv?'اجعلها عامة':'اجعلها خاصة')+'</button>'+
+              '<button class="danger" data-act="del" data-id="'+esc(p.id)+'"'+(busy?' disabled':'')+'>حذف</button></div>';
         }
-        return '<article class="poem" id="p-'+esc(p.id)+'"><h2>'+esc(p.title)+'</h2><div class="meta">'+esc(fmtDate(p.date))+'</div>'+
+        return '<article class="poem'+(it.priv?' is-priv':'')+'" id="p-'+esc(p.id)+'">'+
+          (it.priv?'<div class="badge-row"><span class="badge">خاصة · لا يراها غيرك</span></div>':'')+
+          '<h2>'+esc(p.title)+'</h2><div class="meta">'+esc(fmtDate(p.date))+'</div>'+
           '<div class="verses">'+verses(p.text)+'</div><div class="end" aria-hidden="true">۞</div>'+tools+'</article>';
       }).join('')+'</div>';
     }
     h+='<footer>جميع القصائد محفوظة لكاتبها</footer>';
     root.innerHTML=h;
-    document.title=state.name||'ديواني';
+    document.title=meta.name||'ديواني';
   }
 
-  function setState(data){
-    state={name:data.name||'ديواني',tagline:data.tagline||'',poems:Array.isArray(data.poems)?data.poems:[]};
-    loaded=true;loadErr=false;
-  }
+  function setPublic(d){meta={name:d.name||'ديواني',tagline:d.tagline||''};pub=Array.isArray(d.poems)?d.poems:[];loaded=true;loadErr=false}
 
-  // Visitors read the published file; the owner reads straight from the repository so edits show at once.
+  // Visitors read the published file only; the private file is never requested for them.
   function loadPublic(){
     return fetch(FILE+'?v='+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json()})
-      .then(function(d){setState(d)},function(){loaded=false;loadErr=true});
+      .then(setPublic,function(){loaded=false;loadErr=true});
+  }
+  function readFile(repo,file){
+    return gh(api(repo)+'/contents/'+file).then(function(r){
+      if(r.status===404)return {sha:null,data:null};
+      if(!r.ok)throw r.status;
+      return r.json().then(function(j){return {sha:j.sha,data:JSON.parse(fromB64(j.content))}});
+    });
   }
   function loadOwner(){
-    return gh('/contents/'+FILE).then(function(r){if(!r.ok)throw r.status;return r.json()})
-      .then(function(j){sha=j.sha;setState(JSON.parse(fromB64(j.content)))});
+    return readFile(REPO,FILE).then(function(f){shaPub=f.sha;setPublic(f.data||{})})
+      .then(function(){return gh(api(PRIV_REPO))})
+      .then(function(r){
+        privOk=r.ok;
+        if(!privOk){priv=[];shaPriv=null;return}
+        return readFile(PRIV_REPO,PRIV_FILE).then(function(f){shaPriv=f.sha;priv=f.data&&Array.isArray(f.data.poems)?f.data.poems:[]});
+      });
   }
   function checkToken(){
-    return gh('').then(function(r){if(!r.ok)throw r.status;return r.json()})
+    return gh(api(REPO)).then(function(r){if(!r.ok)throw r.status;return r.json()})
       .then(function(repo){if(!repo.permissions||!repo.permissions.push)throw 403;isOwner=true;return loadOwner()});
   }
 
-  function save(next,done){
-    busy=true;msg='جارٍ النشر…';msgErr=false;render();
-    var body={message:'تحديث الديوان',content:toB64(JSON.stringify(next,null,2)+'\n'),sha:sha};
-    gh('/contents/'+FILE,{method:'PUT',body:JSON.stringify(body)}).then(function(r){
+  function putFile(repo,file,obj,sha){
+    var body={message:'تحديث الديوان',content:toB64(JSON.stringify(obj,null,2)+'\n')};
+    if(sha)body.sha=sha;
+    return gh(api(repo)+'/contents/'+file,{method:'PUT',body:JSON.stringify(body)}).then(function(r){
       if(r.status===409||r.status===422)throw 'conflict';
-      if(r.status===401||r.status===403)throw 'auth';
+      if(r.status===401||r.status===403||r.status===404)throw 'auth';
       if(!r.ok)throw 'other';
       return r.json();
-    }).then(function(j){
-      sha=j.content.sha;setState(next);
+    }).then(function(j){return j.content.sha});
+  }
+
+  // change: {meta?, pub?, priv?}. When a poem moves between lists, the list it joins is written
+  // first, so a failure halfway leaves it in both lists rather than in neither.
+  function save(change,done){
+    busy=true;msg='جارٍ النشر…';msgErr=false;render();
+    var steps=[];
+    function pubStep(){return putFile(REPO,FILE,{name:(change.meta||meta).name,tagline:(change.meta||meta).tagline,poems:change.pub||pub},shaPub)
+      .then(function(s){shaPub=s;if(change.meta)meta=change.meta;if(change.pub)pub=change.pub})}
+    function privStep(){return putFile(PRIV_REPO,PRIV_FILE,{poems:change.priv},shaPriv).then(function(s){shaPriv=s;priv=change.priv})}
+    var doPub=!!(change.pub||change.meta), doPriv=!!change.priv;
+    if(doPriv&&doPub&&change.priv.length>priv.length)steps=[privStep,pubStep];
+    else{if(doPub)steps.push(pubStep);if(doPriv)steps.push(privStep)}
+    steps.reduce(function(chain,step){return chain.then(step)},Promise.resolve()).then(function(){
       try{sessionStorage.removeItem(DRAFT)}catch(e){}
       if(done)done();
-      busy=false;msg='تم النشر. تظهر للزوار خلال دقيقة أو دقيقتين.';render();
+      busy=false;
+      msg=doPub?'تم الحفظ. التغييرات العامة تظهر للزوار خلال دقيقة أو دقيقتين.':'تم الحفظ. القصيدة الخاصة لا يراها أحد غيرك.';
+      render();
     },function(code){
       busy=false;msgErr=true;
       if(code==='conflict'){msg='تغيّر الملف من مكان آخر. حمّلت أحدث نسخة، أعد المحاولة.';loadOwner().then(render,render);return}
-      if(code==='auth'){msg='المفتاح لم يعد صالحًا. اخرج وادخل بمفتاح جديد.'}
-      else msg='تعذّر النشر. مسودتك محفوظة، جرّب مرة أخرى.';
+      if(code==='auth')msg=doPriv?'المفتاح لا يملك صلاحية الكتابة على '+PRIV_REPO+' أو انتهت صلاحيته.':'المفتاح لم يعد صالحًا. اخرج وادخل بمفتاح جديد.';
+      else msg='تعذّر الحفظ. مسودتك محفوظة، جرّب مرة أخرى.';
       render();
     });
+  }
+
+  // Build the change that puts poem `np` (same id as an existing one, or new) into the chosen list.
+  function placeChange(np,toPriv){
+    var cur=findPoem(np.id), change={};
+    var P=pub.filter(function(p){return p.id!==np.id}), Q=priv.filter(function(p){return p.id!==np.id});
+    if(toPriv)Q=[np].concat(Q);else P=[np].concat(P);
+    if(!cur||cur.priv!==toPriv||!toPriv)change.pub=P;
+    if(!cur||cur.priv!==toPriv||toPriv)change.priv=Q;
+    if(!cur&&!toPriv)delete change.priv;
+    if(!cur&&toPriv)delete change.pub;
+    return change;
   }
 
   root.addEventListener('click',function(e){
@@ -237,14 +307,18 @@ footer{text-align:center;font-size:13px;color:var(--ink-faint)}
     else if(a==='cancel'){editing=null;editingHead=false;try{sessionStorage.removeItem(DRAFT)}catch(x){}}
     else if(a==='del'){confirmDel=id}
     else if(a==='del-no'){confirmDel=null}
-    else if(a==='del-yes'){var n=JSON.parse(JSON.stringify(state));n.poems=n.poems.filter(function(p){return p.id!==id});confirmDel=null;save(n);return}
-    else if(a==='logout'){try{localStorage.removeItem(TOKEN_KEY)}catch(x){}token=null;isOwner=false;editing=null;editingHead=false;history.replaceState(null,'',location.pathname);loadPublic().then(render);}
+    else if(a==='del-yes'){
+      var f=findPoem(id);confirmDel=null;if(!f)return;
+      save(f.priv?{priv:priv.filter(function(p){return p.id!==id})}:{pub:pub.filter(function(p){return p.id!==id})});return;
+    }
+    else if(a==='flip'){var g=findPoem(id);if(g)save(placeChange(clone(g.p),!g.priv));return}
+    else if(a==='logout'){try{localStorage.removeItem(TOKEN_KEY)}catch(x){}token=null;isOwner=false;privOk=false;priv=[];editing=null;editingHead=false;history.replaceState(null,'',location.pathname);loadPublic().then(render);}
     msg='';msgErr=false;render();
-    var f=root.querySelector('#ed-title,#hd-name');if(f)f.focus();
+    var fe=root.querySelector('#ed-title,#hd-name');if(fe)fe.focus();
   });
   root.addEventListener('input',function(e){
     if(!e.target.closest('#ed'))return;
-    try{sessionStorage.setItem(DRAFT,JSON.stringify({id:editing,title:document.getElementById('ed-title').value,text:document.getElementById('ed-text').value}))}catch(x){}
+    try{sessionStorage.setItem(DRAFT,JSON.stringify({id:editing,title:document.getElementById('ed-title').value,text:document.getElementById('ed-text').value,priv:document.getElementById('ed-priv').checked}))}catch(x){}
   });
   root.addEventListener('submit',function(e){
     e.preventDefault();
@@ -259,13 +333,14 @@ footer{text-align:center;font-size:13px;color:var(--ink-faint)}
       });
       return;
     }
-    var n=JSON.parse(JSON.stringify(state));
-    if(e.target.id==='hd'){n.name=document.getElementById('hd-name').value.trim()||state.name;n.tagline=document.getElementById('hd-tag').value.trim();save(n,function(){editingHead=false});return}
-    var t=document.getElementById('ed-title').value.trim(),x=document.getElementById('ed-text').value.replace(/\s+$/,'');
+    if(e.target.id==='hd'){
+      save({meta:{name:document.getElementById('hd-name').value.trim()||meta.name,tagline:document.getElementById('hd-tag').value.trim()}},function(){editingHead=false});return;
+    }
+    var t=document.getElementById('ed-title').value.trim(),x=document.getElementById('ed-text').value.replace(/\s+$/,''),pv=document.getElementById('ed-priv').checked&&privOk;
     if(!t||!x.trim()){msg='اكتب العنوان والأبيات قبل النشر.';msgErr=true;render();return}
-    if(editing==='new')n.poems.unshift({id:Date.now().toString(36),title:t,text:x,date:new Date().toISOString()});
-    else n.poems=n.poems.map(function(p){return p.id===editing?{id:p.id,title:t,text:x,date:p.date}:p});
-    save(n,function(){editing=null});
+    var old=editing==='new'?null:findPoem(editing);
+    var np=old?{id:old.p.id,title:t,text:x,date:old.p.date}:{id:Date.now().toString(36),title:t,text:x,date:new Date().toISOString()};
+    save(placeChange(np,pv),function(){editing=null});
   });
   window.addEventListener('hashchange',function(){if(!isOwner)render()});
 
