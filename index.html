@@ -4,8 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>ديواني</title>
-<meta name="description" content="ديوان شعر">
+<meta name="description" content="ديوان شعر بقلم الشاعر عمار علي القحطاني">
+<meta name="author" content="عمار علي القحطاني">
+<meta property="og:type" content="website">
+<meta property="og:title" content="ديواني · عمار علي القحطاني">
+<meta property="og:description" content="قصائد بقلم عمار علي القحطاني">
+<meta property="og:url" content="https://amar1010900.github.io/diwani/">
+<meta property="og:locale" content="ar_SA">
 <meta name="theme-color" content="#2a1a12">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"ديواني","url":"https://amar1010900.github.io/diwani/","inLanguage":"ar","author":{"@type":"Person","name":"عمار علي القحطاني"},"copyrightHolder":{"@type":"Person","name":"عمار علي القحطاني"}}</script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%232a1a12'/%3E%3Ctext x='32' y='46' font-size='40' text-anchor='middle' fill='%23d4a94e' font-family='serif'%3E%DB%9E%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -48,6 +55,13 @@ h1{font-family:var(--f-name);font-weight:700;font-size:clamp(64px,16vw,112px);li
 @media (prefers-reduced-motion:no-preference){h1{animation:gild 2.8s ease-out .2s both}@keyframes gild{from{background-position:0 0}to{background-position:100% 0}}}
 .tag{font-family:var(--f-poem);font-size:21px;color:var(--ink-soft);margin:0;text-wrap:balance}
 .count{font-size:13px;color:var(--ink-faint)}
+.byline{margin:0;font-family:var(--f-poem);font-size:19px;color:var(--ink-faint);display:flex;align-items:center;gap:10px}
+.byline b{font-family:var(--f-name);font-weight:700;font-size:26px;color:var(--gold)}
+/* signature sits at the poem's end: bottom-left in a right-to-left page */
+.sign{margin-top:24px;display:flex;flex-direction:column;align-items:flex-end;text-align:center}
+.sign .by{font-family:var(--f-poem);font-size:15px;color:var(--ink-faint)}
+.sign .name{font-family:var(--f-name);font-weight:700;font-size:clamp(24px,5vw,30px);line-height:1.3;color:var(--gold)}
+.rights{display:flex;flex-direction:column;gap:4px;align-items:center}
 
 /* small header on a poem page */
 .topnav{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
@@ -171,6 +185,7 @@ footer{text-align:center;font-size:13px;color:var(--ink-faint)}
   // Private poems live in a separate PRIVATE repository that only the owner's key can open.
   var OWNER='amar1010900', REPO='diwani', FILE='poems.json', PRIV_REPO='diwani-private', PRIV_FILE='private.json';
   var TOKEN_KEY='diwani-token', DRAFT='diwani-draft', SCALE_KEY='diwani-scale';
+  var AUTHOR='عمار علي القحطاني', SITE='https://amar1010900.github.io/diwani/';
   function api(repo){return 'https://api.github.com/repos/'+OWNER+'/'+repo}
 
   var root=document.getElementById('root'), toastEl=document.getElementById('toast');
@@ -308,7 +323,9 @@ footer{text-align:center;font-size:13px;color:var(--ink-faint)}
     var n=pub.length, c=n?plural(n):'';
     if(isOwner&&priv.length)c+=(c?' · ':'')+priv.length+' خاصة';
     return '<header class="mast"><div class="orn" aria-hidden="true">۞</div><div class="name-wrap"><span class="rule l" aria-hidden="true"></span><h1>'+esc(meta.name)+'</h1><span class="rule r" aria-hidden="true"></span></div>'+
-      (meta.tagline?'<p class="tag">'+esc(meta.tagline)+'</p>':'')+(c?'<div class="count">'+esc(c)+'</div>':'')+'</header>';
+      (meta.tagline?'<p class="tag">'+esc(meta.tagline)+'</p>':'')+
+      '<p class="byline">بقلم الشاعر <b>'+esc(AUTHOR)+'</b></p>'+
+      (c?'<div class="count">'+esc(c)+'</div>':'')+'</header>';
   }
   function ownerBar(){
     return '<div class="bar"><span class="who"><span class="dot" aria-hidden="true"></span>وضع الكتابة</span><div class="btns">'+
@@ -376,8 +393,9 @@ footer{text-align:center;font-size:13px;color:var(--ink-faint)}
     }
     return top+'<article class="poem'+(it.priv?' is-priv':'')+'">'+
       (it.priv?'<div class="pill-row"><span class="pill">خاصة · لا يراها غيرك</span></div>':'')+
-      '<h2>'+esc(p.title)+'</h2><div class="meta">'+esc(fmtDate(p.date))+'</div>'+
-      '<div class="verses">'+verses(p.text)+'</div><div class="end" aria-hidden="true">۞</div>'+own+'</article>'+tools+pager;
+      '<h2>'+esc(p.title)+'</h2><div class="meta">'+esc(AUTHOR)+' · '+esc(fmtDate(p.date))+'</div>'+
+      '<div class="verses">'+verses(p.text)+'</div><div class="end" aria-hidden="true">۞</div>'+
+      '<div class="sign"><span class="by">شعر</span><span class="name">'+esc(AUTHOR)+'</span></div>'+own+'</article>'+tools+pager;
   }
 
   function editorView(){
@@ -424,12 +442,19 @@ footer{text-align:center;font-size:13px;color:var(--ink-faint)}
     else if(r.view==='login')h+=loginView();
     else if(r.view==='poem')h+=poemView(r.id);
     else h+=masthead()+indexView();
-    h+='<footer>جميع القصائد محفوظة لكاتبها</footer>';
+    h+='<footer class="rights"><span>© '+new Date().getFullYear()+' '+esc(AUTHOR)+'. جميع الحقوق محفوظة.</span><span>لا يجوز نقل القصائد أو نشرها دون ذكر اسم الشاعر.</span></footer>';
     var a=document.activeElement, keep=a&&a.id==='q'?[a.selectionStart,a.selectionEnd]:null;
     root.innerHTML=h;
     if(keep){var q=document.getElementById('q');if(q){q.focus();q.setSelectionRange(keep[0],keep[1])}}
     var it=r.view==='poem'&&!mode?findPoem(r.id):null;
-    document.title=it?it.p.title+' · '+meta.name:(meta.name||'ديواني');
+    document.title=it?it.p.title+' · '+AUTHOR:(meta.name||'ديواني')+' · '+AUTHOR;
+    // Machine-readable authorship for search engines, for the public poem on screen.
+    var ld=document.getElementById('poem-ld');
+    if(it&&!it.priv){
+      if(!ld){ld=document.createElement('script');ld.type='application/ld+json';ld.id='poem-ld';document.head.appendChild(ld)}
+      ld.textContent=JSON.stringify({'@context':'https://schema.org','@type':'Poem','name':it.p.title,'inLanguage':'ar','datePublished':it.p.date,
+        'author':{'@type':'Person','name':AUTHOR},'copyrightHolder':{'@type':'Person','name':AUTHOR},'url':SITE+'#p-'+encodeURIComponent(it.p.id)});
+    }else if(ld)ld.remove();
   }
 
   // ---------- editing ----------
@@ -531,6 +556,17 @@ footer{text-align:center;font-size:13px;color:var(--ink-faint)}
   document.addEventListener('keydown',function(e){
     if(mode==='edit'&&(e.ctrlKey||e.metaKey)&&(e.key==='s'||e.key==='S')){e.preventDefault();if(!busy)submitPoem()}
     if(e.key==='Escape'&&mode==='head'){mode=null;render()}
+  });
+  // Copying verses from a poem page carries the poet's name and the poem's link with them.
+  document.addEventListener('copy',function(e){
+    var sel=window.getSelection(), txt=sel?String(sel):'';
+    if(!txt.trim()||!e.clipboardData)return;
+    var n=sel.anchorNode, el=n&&(n.nodeType===1?n:n.parentElement);
+    if(!el||!el.closest('article.poem'))return;
+    var r=route(), it=r.view==='poem'?findPoem(r.id):null;
+    txt=txt.replace(/\s*\n\s*✦\s*\n\s*/g,'   ✦   ');
+    e.clipboardData.setData('text/plain',txt.trim()+'\n\n— '+AUTHOR+(it?'، «'+it.p.title+'»':'')+'\n'+(it&&!it.priv?SITE+'#p-'+encodeURIComponent(it.p.id):SITE));
+    e.preventDefault();
   });
   window.addEventListener('beforeunload',function(e){if(mode==='edit'&&dirty){e.preventDefault();e.returnValue=''}});
   function onNav(){
